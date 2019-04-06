@@ -1,6 +1,8 @@
 defmodule Odds do
   def round_odds(odds, ladder) do
-    Enum.map(odds, fn current_odds -> aply_rounding(current_odds, ladder) end)
+    odds
+    |> Stream.map(&aply_rounding(&1, ladder))
+    |> Enum.to_list()
   end
 
   defp aply_rounding(odds, ladder) do
