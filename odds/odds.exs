@@ -13,24 +13,32 @@ defmodule Odds do
   defp do_aply_rounding(odds, ladder) do
     Enum.reduce_while(
       ladder,
-      {:infinity, :infinity, []},
+      rounding_result(odds, :infinity, [], :infinity),
       fn current_ladder_value, acc ->
-        {best_difference, best_ladder_value, previous_ladder_values} = acc
+        %{
+          best_diff: best_difference,
+          given_odds: odds,
+          resulted_ladder: best_ladder_value,
+          previous_ladder_values: previous_ladder_values
+        } = acc
 
         previous_ladder_values = [current_ladder_value | previous_ladder_values]
         current_diff = abs(current_ladder_value - odds)
 
         if current_diff > best_difference do
-          {:halt, rounding_result(odds, best_ladder_value, previous_ladder_values)}
+          {:halt,
+           rounding_result(odds, best_ladder_value, previous_ladder_values, best_difference)}
         else
-          {:cont, {current_diff, current_ladder_value, previous_ladder_values}}
+          {:cont,
+           rounding_result(odds, current_ladder_value, previous_ladder_values, current_diff)}
         end
       end
     )
   end
 
-  defp rounding_result(odds, best_ladder_value, previous_ladder_values) do
+  defp rounding_result(odds, best_ladder_value, previous_ladder_values, best_diff) do
     %{
+      best_diff: best_diff,
       given_odds: odds,
       resulted_ladder: best_ladder_value,
       previous_ladder_values: previous_ladder_values
@@ -69,4 +77,4 @@ defmodule Odds do
 end
 
 ladder = [1.5, 1.75, 1.8, 1.9, 3.0, 40.0]
-IO.inspect(Odds.round_odds([1.6, 1.65, 1.71, 1.77, 1.78], ladder))
+IO.inspect(Odds.round_odds([1.6, 1.65, 1.71, 1.77, 1.78, 1.79, 1.8, 2.0, 30.0], ladder))
